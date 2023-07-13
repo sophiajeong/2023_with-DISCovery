@@ -1,8 +1,8 @@
-#include <Arduino_MKRIoTCarrier.h> // Include Arduino MKRIoTCarrier library
-MKRIoTCarrier carrier; // Declare MKRIoTCarrier object
+#include <Arduino_MKRIoTCarrier.h> 
+MKRIoTCarrier carrier; 
 
-int moistPin = A5; // Humidity sensor pin number.
-int ACPIN = 3; // This is the digital pin number used to control the air conditioner.
+int moistPin = A5; 
+int ACPIN = 3; 
 
 // Store the threshold parameters
 float minHumidity = 60.0;
@@ -14,17 +14,15 @@ float idealTemp = 26.0;
 float humidity;
 float temperature;
 int moistValue;
-bool updateDisplay;
 
 // Air conditioner control
 unsigned long AC_start_time = 0;
-unsigned long AC_max_duration = 10000; // 10 seconds, adjust this value according to your requirement.
+unsigned long AC_max_duration = 10000;
 
 // Light threshold
-int LIGHT_THRESHOLD = 200; // Replace with your light threshold
+int LIGHT_THRESHOLD = 200; 
 
 void setup() {
-  // Initialize serial communication and wait for the port to open.
   Serial.begin(9600);
   while (!Serial);
   
@@ -38,11 +36,7 @@ void loop() {
   // Check if the air conditioner has been on for too long.
   if (digitalRead(ACPIN) == HIGH && (millis() - AC_start_time) > AC_max_duration) {
     digitalWrite(ACPIN, LOW); 
-    carrier.display.fillScreen(ST77XX_WHITE);
-    carrier.display.setTextColor(ST77XX_RED);
-    carrier.display.setTextSize(2);
-    carrier.display.setCursor(20, 130);
-    carrier.display.println("WARNING: Excessive energy use!");
+    displayWarning("WARNING: Excessive energy use!");
   }
 
   // Read the temperature and humidity
@@ -61,7 +55,7 @@ void loop() {
   }
 
   // Light level reading
-  int light = analogRead(A1); // Replace A1 with your light sensor pin
+  int light = analogRead(A1);
 
   // Air conditioner temperature control logic.
   if (light > LIGHT_THRESHOLD) {
@@ -99,6 +93,50 @@ void setTemperature(int desiredTemp) {
   }
 }
 
-void onUpdateDisplayChange(bool redTide) {
-  // Your original function code goes here
+void displayWarning(const char* warning) {
+  carrier.display.fillScreen(ST77XX_WHITE);
+  carrier.display.setTextColor(ST77XX_RED);
+  carrier.display.setTextSize(2);
+  carrier.display.setCursor(20, 130);
+  carrier.display.println(warning);
+  delay(2000);
+
 }
+
+void onUpdateDisplayChange(bool redTide) {
+  carrier.display.fillScreen(ST77XX_WHITE);
+  carrier.display.setTextColor(ST77XX_RED);
+  carrier.display.setTextSize(2);
+ 
+  carrier.display.setCursor(20, 30);
+  carrier.display.print("Temp: ");
+  char buffer[8];
+  snprintf(buffer, sizeof(buffer), "%.4f", temperature);  // print temperature to 4 decimal places
+  carrier.display.print(buffer);
+  carrier.display.print(" C");
+
+  carrier.display.setCursor(20, 50);
+  carrier.display.print("Humi: ");
+  snprintf(buffer, sizeof(buffer), "%.4f", humidity);     // print humidity to 4 decimal places
+  carrier.display.print(buffer);
+  carrier.display.print(" %");
+  
+  carrier.display.setTextColor(ST77XX_BLUE);
+  carrier.display.setCursor(20, 90);
+  carrier.display.print("Moist: ");
+  carrier.display.print(moistValue);
+  carrier.display.print(" %");
+
+  carrier.display.setCursor(20, 110);
+  carrier.display.print("Red Tide: ");
+  carrier.display.print(redTide ? "Yes" : "No");
+  delay(2000);
+
+
+  if (redTide) {
+    displayWarning("WARNING: Red tide!");
+    delay(2000);
+
+  }
+}
+
