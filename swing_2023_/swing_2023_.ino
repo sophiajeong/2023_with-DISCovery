@@ -2,7 +2,7 @@
 MKRIoTCarrier carrier; // MKRIoTCarrier 객체를 생성합니다.
 
 // 센서 및 장치에 사용되는 핀을 설정합니다.
-int moistPin = A5; // 토양 습도 센서 핀
+int moistPin = A5; // 습도 센서 핀
 int ACPIN = 3; // 에어컨 제어 핀
 
 // 임계값을 설정합니다.
@@ -132,7 +132,7 @@ void onUpdateDisplayChange(bool redTide) {
   carrier.display.print(humidity);
   carrier.display.print(" %");
   
-  // 토양 습도 정보를 디스플레이에 표시합니다.
+  // 습도 정보를 디스플레이에 표시합니다.
   carrier.display.setTextColor(ST77XX_BLUE);
   carrier.display.setCursor(20, 90);
   carrier.display.print("Moist: ");
