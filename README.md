@@ -1,4 +1,4 @@
-# SWING-2023_with-DISCovery
+# 2023_with-DISCovery
 
 # 1. 적조란?
 
